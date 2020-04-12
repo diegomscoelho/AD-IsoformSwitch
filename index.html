@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>AD Database</title>
+  </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+  <body>
+
+    <!-- Introduction to site in jumbotron -->
+
+    <div class="container">
+      <div class="jumbotron">
+        <h1>Query table</h1>
+        <h3>Information: Table to access information throughout genes, isoforms, biotypes, etc.</h3>
+      </div>
+    </div>
+
+    <!-- Datatable in jquery -->
+
+    <div class="container">
+
+      <table id="example" class="display" style="width:90%">
+        <thead>
+          <tr>
+              <th>TX_ID</th>
+              <th>GENE_NAME</th>
+              <th>GENE_LOG2FC</th>
+              <th>GENE_PADJ</th>
+              <th>DTU_DIF</th>
+              <th>DTU_OFDR</th>
+              <th>DATASET</th>
+        </tr>
+        </thead>
+
+        <tfoot>
+          <tr>
+              <th>TX_ID</th>
+              <th>GENE_NAME</th>
+              <th>GENE_LOG2FC</th>
+              <th>GENE_PADJ</th>
+              <th>DTU_DIF</th>
+              <th>DTU_OFDR</th>
+              <th>DATASET</th>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div>
+
+    <hr>
+
+    <!-- Intro image -->
+
+    <div class="container">
+      <div class="row">
+        <!-- <div class="col-xs-12 col-md-12"> -->
+          <!-- <a href="#" class="thumbnail"> -->
+            <img id="myImage" class="img-responsive center-block" src="./first.png">
+          <!-- </a> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <!-- Section to thanks hiperlink other sites and acknowledgments -->
+    <div class="container">
+      <h4 class="text-right">Diego M. Coelho</h4>
+      <p class="text-right">Any question, send email to: diegomscoelho@gmail.com</p>
+    </div>
+
+    <!-- Javascript code -->
+
+    <script>
+      
+      $(document).ready(function() {
+            // Import table
+          var table = $('#example').DataTable( {
+            "ajax": "full.json",
+            "columns": [
+              // Which columns should be included?
+                { "data": "TX_ID" },
+                { "data": "GENE_NAME" },
+                { "data": "GENE_LOG2FC" },
+                { "data": "GENE_PADJ" },
+                { "data": "DTU_DIF" },
+                { "data": "DTU_OFDR" },
+                { "data": "DATASET" },
+            ],
+            // How many rows should be included?
+            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+            // Autofill
+            autoFill: true,
+            // Mark as selected
+            select: {
+              style: 'single'
+            }
+          } );
+
+          // Setup - add a text input to each footer cell
+          $('#example tfoot th').each( function () {
+              var title = $(this).text();
+              autoFill: true;
+              $(this).html( '<input style="padding: 3px; width: 100%; box-sizing: border-box" type="text" placeholder="'+title+'" />' );
+          } );
+
+          // Update images based on datatable selection
+          $('#example').on('click', 'tr', function (){
+            var DATASET = table.row( this ).data()['DATASET'];
+            var GENE_NAME = table.row( this ).data()['GENE_NAME'];
+            var myImage = document.getElementById("myImage");
+            myImage.src = "./server_figs/"+ GENE_NAME + ".svg?sanitize=true";
+          });
+
+          // Apply the search
+          table.columns().every( function () {
+              var that = this;
+
+              $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                  if ( that.search() !== this.value ) {
+                      that
+                          .search( this.value )
+                          .draw();
+                  }
+              } );
+          });
+
+      } );
+    </script>
+
+  </body>
+</html>
