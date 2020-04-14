@@ -10,70 +10,73 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-
+    <!-- Bootstrap core CSS -->
+    <link href="https://getbootstrap.com/docs/4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.com/docs/4.1/examples/jumbotron/jumbotron.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <!-- <link href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css" rel="stylesheet"> -->
   <body>
-
+    <div class="container-fluid">
     <!-- Introduction to site in jumbotron -->
 
-    <div class="container">
-      <div class="jumbotron">
-        <h1>Query table</h1>
-        <h3>Information: Table to access information throughout genes, isoforms, biotypes, etc.</h3>
+    <nav class="navbar navbar-expand-md fixed-top" style="background-color: #EE88A3; box-shadow: 0 5px 5px -5px #333; padding: 0px -5px -6px;">
+      <a class="navbar-brand" style="color: #ffffff" href="https://www.medrxiv.org/content/10.1101/2020.03.19.20038703v1">AD-IsoformSwitch</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" style="color: #ffffff" href="index.html">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" style="color: #ffffff" href="about.html">Workflow</a>
+          </li>
+        </ul>
       </div>
-    </div>
-
-    <!-- Datatable in jquery -->
-
-    <div class="container">
-
-      <table id="example" class="display" style="width:90%">
-        <thead>
-          <tr>
-              <th>TX_ID</th>
-              <th>GENE_NAME</th>
-              <th>GENE_LOG2FC</th>
-              <th>GENE_PADJ</th>
-              <th>DTU_DIF</th>
-              <th>DTU_OFDR</th>
-              <th>DATASET</th>
-        </tr>
-        </thead>
-
-        <tfoot>
-          <tr>
-              <th>TX_ID</th>
-              <th>GENE_NAME</th>
-              <th>GENE_LOG2FC</th>
-              <th>GENE_PADJ</th>
-              <th>DTU_DIF</th>
-              <th>DTU_OFDR</th>
-              <th>DATASET</th>
-          </tr>
-        </tfoot>
-      </table>
-
-    </div>
-
-    <hr>
+    </nav>
 
     <!-- Intro image -->
 
-    <div class="container">
-      <div class="row">
-        <!-- <div class="col-xs-12 col-md-12"> -->
+    <hr>
+    <div>
+    <div class="row">
+
+        <!-- Datatable in jquery -->
+        <div class="col-md-10 col-centered">
+
+          <table id="example" class="display" style="width:100%">
+            <thead>
+              <tr>
+                  <th>Transcripts</th>
+                  <th>Genes</th>
+                  <th>Gene Log2FC</th>
+                  <th>Gene FDR</th>
+                  <th>dIF</th>
+                  <th>Transcript OFDR</th>
+                  <th>Dataset</th>
+            </tr>
+            </thead>
+          </table>
+
+        </div>
+
+        <div class="col-md-6 col-centered">
           <!-- <a href="#" class="thumbnail"> -->
             <img id="myImage" class="img-responsive center-block" src="./first.png">
           <!-- </a> -->
-        <!-- </div> -->
-      </div>
+        </div>
     </div>
-
+  </div>
+  <hr>
     <!-- Section to thanks hiperlink other sites and acknowledgments -->
-    <div class="container">
-      <h4 class="text-right">Diego M. Coelho</h4>
-      <p class="text-right">Any question, send email to: diegomscoelho@gmail.com</p>
-    </div>
+    <footer class="footer" style="background-color: #EE88A3;">
+      <div class="container">
+        <span>Diego M. Coelho</span>
+      </div>
+    </footer>
 
     <!-- Javascript code -->
 
@@ -94,7 +97,7 @@
                 { "data": "DATASET" },
             ],
             // How many rows should be included?
-            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+            "lengthMenu": [[5], [""]],
             // Autofill
             autoFill: true,
             // Mark as selected
@@ -115,7 +118,7 @@
             var DATASET = table.row( this ).data()['DATASET'];
             var GENE_NAME = table.row( this ).data()['GENE_NAME'];
             var myImage = document.getElementById("myImage");
-            myImage.src = "./server_figs/"+ GENE_NAME + ".svg?sanitize=true";
+            myImage.src = "https://storage.googleapis.com/ad-isar/server_figs/"+ GENE_NAME + ".svg?sanitize=true";
           });
 
           // Apply the search
@@ -133,6 +136,30 @@
 
       } );
     </script>
-
+  </div>
   </body>
 </html>
+
+<style>
+.dataTables_wrapper {
+    font-size: 13px;
+    position: relative;
+    clear: both;
+    *zoom: 1;
+    zoom: 1;
+}
+
+.col-centered{
+float: none;
+margin: 0 auto;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+}
+</style>
