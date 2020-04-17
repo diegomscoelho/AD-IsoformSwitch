@@ -121,20 +121,7 @@
             myImage.src = "https://storage.googleapis.com/ad-isar/server_figs/"+ GENE_NAME + ".svg?sanitize=true";
           });
 
-          // Apply the search
-          table.columns().every( function () {
-              var that = this;
-
-              $( 'input', this.footer() ).on( 'keyup change clear', function () {
-                  if ( that.search() !== this.value ) {
-                      that
-                          .search( this.value )
-                          .draw();
-                  }
-              } );
-          });
-
-      } );
+      });
     </script>
   </div>
   </body>
