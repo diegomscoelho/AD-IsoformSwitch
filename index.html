@@ -50,13 +50,13 @@
           <table id="example" class="display" style="width:100%">
             <thead>
               <tr>
-                  <th>Transcripts</th>
-                  <th>Genes</th>
-                  <th>Gene Log2FC</th>
-                  <th>Gene FDR</th>
-                  <th>dIF</th>
-                  <th>Transcript OFDR</th>
-                  <th>Dataset</th>
+                  <th class="tag" title="ENSEMBL TRANSCRIPT ID">Transcripts</th>
+                  <th class="tag" title="GENE NAME">Genes</th>
+                  <th class="tag" title="GENE LOG2 FOLD CHANGE">Gene Log2FC</th>
+                  <th class="tag" title="GENE FALSE DISCOVERY RATE">Gene FDR</th>
+                  <th class="tag" title="TRANSCRIPT DIFFERENCE IN ISOFORM FRACTION">dIF</th>
+                  <th class="tag" title="TRANSCRIPT OVERALL FALSE DISCOVERY RATE">Transcript OFDR</th>
+                  <th class="tag" title="DATASETS">Dataset</th>
             </tr>
             </thead>
           </table>
@@ -120,7 +120,6 @@
             var myImage = document.getElementById("myImage");
             myImage.src = "https://storage.googleapis.com/ad-isar/server_figs/"+ GENE_NAME + ".svg?sanitize=true";
           });
-
       });
     </script>
   </div>

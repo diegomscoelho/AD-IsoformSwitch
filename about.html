@@ -44,10 +44,39 @@
   
         <!-- Single-Image -->
         <div class="row">
-            <div class="col-centered">
+            <div class="col">
             <!-- <a href="#" class="thumbnail"> -->
                 <img class="mh-100" id="myImage" src="workflow.png">
             <!-- </a> -->
+            </div>
+            <div style="padding: 50px 60px 20px 40px;" class="col">
+                <h3> Datasets </h3>
+                <p class="text-justify"> RNAseq datasets obtained from different brain regions:
+                  <ul>
+                    <li>Mayo: Allen et al, 2016</li>
+                    <li>MSBB: Wang et al, 2018</li>
+                    <li>ROSMAP: De Jager et al, 2018</li>
+                  </ul>
+                </p>
+                <h3> Differentially expressed genes </h3>
+                <p class="text-justify">
+                  Differentially expressed genes (DEGs) were identified using differential gene expression at
+                  transcript-level using DESeq2 R library (Love et al., 2014, 2019). We selected
+                  all genes with <strong>False Discovery Rate (FDR) < 0.01</strong> and <strong>Fold Change (FC) > 1.3</strong>.
+                </p>
+                <h3> Differential transcript usage </h3>
+                <p class="text-justify"> Differential Transcript Usage (DTU)
+                  analysis was performed using the R library IsoformSwitchAnalyzeR (Vitting-Seerup & Sandelin, 2019) and stageR
+                  (Van den Berge et al., 2017) to generate isoforms overall false discovery rate (OFDR).
+                  We selected all isoforms with <strong>OFDR < 0.01</strong> and
+                  <strong>dIF (difference in isoform fraction) > 0.05</strong>.
+                </p>
+                <h3> Datatable and Heatmap </h3>
+                <p class="text-justify"> To facilitate our data visualization, we selected <strong> only genes that have
+                  at least one DEG and/or DTU </strong>. After that, we made heatmaps with DEG and/or DTU for each gene.
+                  Non-DEG or Non-DTU were represented in blank. For more information, visit our publication supplementary tables.
+
+                </p>
             </div>
         </div>
     
