@@ -55,7 +55,7 @@ aSwitchListAnalyzed <- isoformSwitchTestDRIMSeq(
 
 saveRDS(aSwitchListAnalyzed, "Mayo.TCX.aSwitchListAnalyzed.rds")
 
-extractSequence(preFilter(aSwitchListAnalyzed, IFcutoff=0.05, reduceToSwitchingGenes=T), pathToOutput="../data/TCX_fasta/", outputPrefix="Mayo.TCX")
+extractSequence(preFilter(aSwitchListAnalyzed, IFcutoff=0.05, reduceToSwitchingGenes=T), pathToOutput="TCX_fasta/", outputPrefix="Mayo.TCX")
 
 # TCX <- readRDS("Mayo.TCX.aSwitchListAnalyzed.rds")
 
