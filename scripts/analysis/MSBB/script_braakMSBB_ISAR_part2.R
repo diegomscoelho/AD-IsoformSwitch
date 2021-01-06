@@ -8,7 +8,7 @@ library(dplyr)
 ### Import Data
 kallisto_path = "PATH-TO/reprocessing/kallisto/MSBB/" # Set path
 # Import data files
-files = paste0(list.files("../data/kallisto", full.names=T),"/abundance.tsv")
+files = paste0(list.files(kallisto_path, full.names=T),"/abundance.tsv")
 
 # Reference
 tx2gene <- read.table("~/diegocoelho/refs/tr2g.All.txt", header = T, stringsAsFactors = F)
