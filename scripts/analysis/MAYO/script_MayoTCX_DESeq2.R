@@ -9,6 +9,7 @@ library(dplyr)
 ### Import Data
 kallisto_path = "PATH-TO/reprocessing/kallisto/MAYO_TCX/" # Set path
 ## Import metadata
+# https://www.synapse.org/#!Synapse:syn3817650 - MayoRNAseq_RNAseq_TCX_covariates.csv
 MayoTCX_metadata <- read.csv("../refs/MayoRNAseq_RNAseq_TCX_covariates.csv", stringsAsFactors=F, header = T)
 myDesign <- MayoTCX_metadata %>% select(SampleID, Diagnosis, RIN, Sex) %>% filter(Diagnosis %in% c("Control", "AD")) %>% arrange(SampleID)
 rownames(myDesign) = myDesign$SampleID
