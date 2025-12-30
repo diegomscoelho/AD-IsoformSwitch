@@ -8,8 +8,12 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js"></script>
     <!-- Bootstrap core CSS -->
     <link href="https://getbootstrap.com/docs/4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -63,10 +67,9 @@
 
         </div>
 
-        <div class="col-md-6 col-centered"> 
-          <!-- <a href="#" class="thumbnail"> -->
-            <img id="myImage" class="img-responsive center-block" src="./first.png">
-          <!-- </a> -->
+        <div class="col-md-10 col-centered"> 
+          <!-- Heatmap visualization -->
+          <div id="heatmapPlot" style="width:100%; border:1px solid #ddd; margin-top:20px;"></div>
         </div>
     </div>
   </div>
@@ -82,10 +85,26 @@
 
     <script>
       
+      // Store all data globally for filtering
+      var allData = [];
+      
       $(document).ready(function() {
             // Import table
           var table = $('#example').DataTable( {
-            "ajax": "full.json",
+            "ajax": {
+              "url": "full.json",
+              "dataSrc": function(json) {
+                console.log("Data loaded:", json.data.length, "rows");
+                allData = json.data;
+                // Create initial heatmap after data loads
+                if (json.data && json.data.length > 0) {
+                  setTimeout(function() {
+                    createHeatmap(json.data[0].GENE_NAME);
+                  }, 100);
+                }
+                return json.data;
+              }
+            },
             "columns": [
               // Which columns should be included?
                 { "data": "TX_ID" },
@@ -98,6 +117,32 @@
             ],
             // How many rows should be included?
             "lengthMenu": [[5], [""]],
+            // Export buttons
+            dom: 'Bfrtip',
+            buttons: [
+              {
+                extend: 'csv',
+                text: 'Download CSV',
+                exportOptions: {
+                  columns: ':visible',
+                  modifier: {
+                    page: 'all',
+                    search: 'none'
+                  }
+                }
+              },
+              {
+                extend: 'excel',
+                text: 'Download Excel',
+                exportOptions: {
+                  columns: ':visible',
+                  modifier: {
+                    page: 'all',
+                    search: 'none'
+                  }
+                }
+              }
+            ],
             // Autofill
             autoFill: true,
             // Mark as selected
@@ -113,12 +158,164 @@
               $(this).html( '<input style="padding: 3px; width: 100%; box-sizing: border-box" type="text" placeholder="'+title+'" />' );
           } );
 
-          // Update images based on datatable selection
+          // Function to create heatmap
+          function createHeatmap(geneName) {
+            console.log("Creating heatmap for gene:", geneName);
+            console.log("Total data rows:", allData.length);
+            
+            // Filter data for selected gene
+            var geneData = allData.filter(function(row) {
+              return row.GENE_NAME === geneName;
+            });
+            
+            console.log("Filtered gene data rows:", geneData.length);
+            
+            if (geneData.length === 0) {
+              console.warn("No data found for gene:", geneName);
+              document.getElementById('heatmapPlot').innerHTML = '<div style="padding:20px;text-align:center;color:#666;">No data available for gene: ' + geneName + '</div>';
+              return;
+            }
+            
+            // Prepare data for heatmap
+            var transcripts = [];
+            
+            geneData.forEach(function(row) {
+              transcripts.push(row.TX_ID.split('.')[0]); // Remove version number
+            });
+            
+            // Define all possible datasets (fixed 6 columns)
+            var allDatasets = ['MAYO', 'ROSMAP', 'MSBB BM10', 'MSBB BM22', 'MSBB BM36', 'MSBB BM44'];
+            
+            // Create unique list for transcript rows
+            var uniqueTranscripts = [...new Set(transcripts)];
+            
+            // Prepare z-values matrices for Gene Log2FC and dIF
+            var zLog2FC = [];
+            var zDIF = [];
+            var geneFDR = [];
+            var transcriptFDR = [];
+            
+            uniqueTranscripts.forEach(function(tx) {
+              var rowLog2FC = [];
+              var rowDIF = [];
+              var rowGeneFDR = [];
+              var rowTranscriptFDR = [];
+              
+              allDatasets.forEach(function(ds) {
+                var found = geneData.find(function(d) {
+                  return d.TX_ID.split('.')[0] === tx && d.DATASET === ds;
+                });
+                
+                if (found) {
+                  rowLog2FC.push(found.GENE_LOG2FC);
+                  rowDIF.push(found.DTU_DIF);
+                  rowGeneFDR.push(found.GENE_PADJ);
+                  rowTranscriptFDR.push(found.DTU_OFDR);
+                } else {
+                  rowLog2FC.push(null);
+                  rowDIF.push(null);
+                  rowGeneFDR.push(null);
+                  rowTranscriptFDR.push(null);
+                }
+              });
+              
+              zLog2FC.push(rowLog2FC);
+              zDIF.push(rowDIF);
+              geneFDR.push(rowGeneFDR);
+              transcriptFDR.push(rowTranscriptFDR);
+            });
+            
+            // Create two heatmaps side by side
+            var trace1 = {
+              z: zLog2FC,
+              x: allDatasets,
+              y: uniqueTranscripts,
+              type: 'heatmap',
+              colorscale: 'RdBu',
+              zmid: 0,
+              customdata: geneFDR,
+              colorbar: {
+                x: 0.44,
+                len: 0.9,
+                title: 'Log2FC'
+              },
+              xaxis: 'x',
+              yaxis: 'y',
+              hovertemplate: 'Dataset: %{x}<br>Transcript: %{y}<br>Gene Log2FC: %{z:.3f}<br>Gene FDR: %{customdata:.4e}<extra></extra>'
+            };
+            
+            var trace2 = {
+              z: zDIF,
+              x: allDatasets,
+              y: uniqueTranscripts,
+              type: 'heatmap',
+              colorscale: 'Viridis',
+              zmid: 0,
+              customdata: transcriptFDR,
+              colorbar: {
+                x: 1.02,
+                len: 0.9,
+                title: 'dIF'
+              },
+              xaxis: 'x2',
+              yaxis: 'y2',
+              hovertemplate: 'Dataset: %{x}<br>Transcript: %{y}<br>dIF: %{z:.3f}<br>Transcript FDR: %{customdata:.4e}<extra></extra>'
+            };
+            
+            var layout = {
+              title: {
+                text: 'Gene: ' + geneName + ' - Isoform Switch Analysis',
+                font: {size: 14}
+              },
+              xaxis: {
+                domain: [0, 0.42],
+                anchor: 'y',
+                title: '',
+                tickangle: -45,
+                side: 'bottom',
+                tickfont: {size: 10}
+              },
+              yaxis: {
+                domain: [0, 1],
+                anchor: 'x',
+                title: '',
+                automargin: true,
+                tickfont: {size: 9}
+              },
+              xaxis2: {
+                domain: [0.55, 0.97],
+                anchor: 'y2',
+                title: '',
+                tickangle: -45,
+                side: 'bottom',
+                tickfont: {size: 10}
+              },
+              yaxis2: {
+                domain: [0, 1],
+                anchor: 'x2',
+                showticklabels: false,
+                title: ''
+              },
+              height: Math.min(window.innerHeight - 400, Math.max(300, uniqueTranscripts.length * 25 + 100)),
+              margin: {l: 100, r: 80, t: 50, b: 80}
+            };
+            
+            Plotly.newPlot('heatmapPlot', [trace1, trace2], layout, {responsive: true})
+              .then(function() {
+                console.log("Heatmap rendered successfully");
+              })
+              .catch(function(err) {
+                console.error("Error rendering heatmap:", err);
+              });
+          }
+          
+          // Update heatmap based on datatable selection
           $('#example').on('click', 'tr', function (){
-            var DATASET = table.row( this ).data()['DATASET'];
-            var GENE_NAME = table.row( this ).data()['GENE_NAME'];
-            var myImage = document.getElementById("myImage");
-            myImage.src = "https://storage.googleapis.com/ad-isar/server_figs/"+ GENE_NAME + ".svg?sanitize=true";
+            var rowData = table.row( this ).data();
+            if (rowData) {
+              var GENE_NAME = rowData['GENE_NAME'];
+              createHeatmap(GENE_NAME);
+            }
           });
       });
     </script>
@@ -128,7 +325,7 @@
 
 <style>
 .dataTables_wrapper {
-    font-size: 13px;
+    font-size: 11px;
     position: relative;
     clear: both;
     *zoom: 1;
